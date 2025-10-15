@@ -1,0 +1,13 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+app:
+  s3:
+    region: ${AWS_REGION:ap-southeast-2}
+    pricePerGb:
+      STANDARD: 0.033
+      STANDARD_IA: 0.0198
+      ONEZONE_IA: 0.0152
+      GLACIER_IR: 0.0052
+      GLACIER: 0.0045
+      DEEP_ARCHIVE: 0.0012

@@ -1,0 +1,63 @@
+version: "3.9"
+
+services:
+  localstack:
+    image: localstack/localstack:3
+    container_name: localstack
+    ports:
+      - "4566:4566"
+      - "4571:4571"
+    environment:
+      - SERVICES=s3,sqs,sts
+      - AWS_DEFAULT_REGION=ap-southeast-2
+      - EDGE_PORT=4566
+      - DEBUG=0
+      - LS_LOG=info
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - "localstack-data:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    healthcheck:
+      test: ["CMD", "bash", "-c", "awslocal s3 ls || exit 1"]
+      interval: 5s
+      timeout: 4s
+      retries: 20
+
+  init-localstack:
+    image: localstack/localstack:3
+    container_name: init-localstack
+    depends_on:
+      localstack:
+        condition: service_healthy
+    entrypoint: ["/bin/bash","-lc","/init/bootstrap.sh"]
+    environment:
+      - AWS_DEFAULT_REGION=ap-southeast-2
+      - LOCALSTACK_HOST=localstack
+      - BUCKET_NAME=demo-bucket
+      - PREFIX=uploads/
+    volumes:
+      - ./init:/init
+
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: s3-cost-aware-app
+    depends_on:
+      localstack:
+        condition: service_healthy
+      init-localstack:
+        condition: service_completed_successfully
+    environment:
+      - SERVER_PORT=8080
+      - AWS_REGION=ap-southeast-2
+      - AWS_ENDPOINT=http://localstack:4566
+      - S3_BUCKET=demo-bucket
+      - S3_PREFIX=uploads/
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+    ports:
+      - "8080:8080"
+
+volumes:
+  localstack-data:

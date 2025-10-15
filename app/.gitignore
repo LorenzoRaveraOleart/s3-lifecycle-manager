@@ -1,0 +1,46 @@
+# --- OS / Editor ---
+.DS_Store
+Thumbs.db
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# --- Java / Maven ---
+**/target/
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/timing.properties
+dependency-reduced-pom.xml
+
+# --- Logs ---
+*.log
+logs/
+**/hs_err_pid*.log
+**/replay_pid*.log
+
+# --- Build / Packaging junk ---
+*.class
+*.jar
+*.war
+*.ear
+
+# --- Docker / Compose ---
+# keep Dockerfile and compose files tracked
+docker-data/
+.localstack/
+**/.docker/
+**/.envrc
+.env
+
+# --- Node/Yarn (just in case you add a tiny UI) ---
+node_modules/
+dist/
+build/
+
+# --- IntelliJ shared stuff you DON’T want ---
+out/
+
+# --- Project-specific ---
+# LocalStack bootstrap temp files if you ever generate them
+init/*.tmp
+init/*.bak
